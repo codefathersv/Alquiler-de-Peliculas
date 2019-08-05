@@ -1,0 +1,72 @@
+create database if not exists bd_peliculas;
+use bd_peliculas;
+
+create table if not exists dbo_clientes(
+id_cliente int not null auto_increment primary key,
+nombre_cliente varchar(50) not null,
+apellido_cliente varchar(50) not null,
+direccion varchar(100) not null,
+correo varchar(50) not null,
+num_celular varchar(9) not null
+)engine InnoDB;
+
+create table if not exists dbo_clasificacion(
+id_clasificacion int not null auto_increment primary key,
+clasificacion varchar(30) not null
+)engine InnoDB;
+
+create table if not exists dbo_categoria(
+id_categoria int not null auto_increment primary key,
+categoria varchar(30) not null
+)engine InnoDB;
+
+create table if not exists dbo_peliculas(
+id_pelicula int not null auto_increment primary key,
+nombre_pelicula varchar(50) not null,
+sinopsis text not null,
+id_clasificacion int not null, 
+id_categoria int not null, 
+age_estreno int not null,
+constraint clasificacion foreign key(id_clasificacion) references dbo_clasificacion(id_clasificacion) on update cascade on delete cascade,
+constraint categoria foreign key(id_categoria) references dbo_categoria(id_categoria) on update cascade on delete cascade
+)engine InnoDB;
+
+create table if not exists dbo_estado(
+id_estado int not null auto_increment primary key,
+estado varchar(30) not null
+)engine InnoDB;
+
+create table if not exists dbo_alquiler(
+id_alquiler int not null auto_increment primary key,
+id_pelicula int not null,
+id_cliente int not null,
+descripcion text not null,
+fecha_alquiler date not null,
+fecha_entrega date not null,
+costo decimal(3,2) not null,
+id_estado int not null,
+constraint pelicula foreign key(id_pelicula) references dbo_peliculas(id_pelicula) on update cascade on delete cascade,
+constraint cliente foreign key(id_cliente) references dbo_clientes(id_cliente) on update cascade on delete cascade,
+constraint estado foreign key(id_estado) references dbo_estado(id_estado) on update cascade on delete cascade
+)engine InnoDB;
+
+insert into dbo_clientes(nombre_cliente,apellido_cliente,direccion,correo,num_celular) values('Alvin','Yakitory','San Salvador','yakitory@gmail.com','7865-1234'),
+('Jefferson','Gutierritos','San Salvador','gutierritos@gmail.com','7143-5023');
+insert into dbo_clasificacion(clasificacion) values('A - Todo publico'),('B - Mayores de 12 años'),('C - Mayores de 15 años'),('D - Mayores de 18 años'),('E - Mayores de 21 años');
+insert into dbo_categoria(categoria) values('Accion'),('Aventuras'),('Comedias'),('Dramaticas'),('Terror'),('Musicales'),('Ciencia ficcion'),
+('Bélicas'),('Oeste'),('Suspenso'),('Infantiles'),('Adultos');
+insert into dbo_peliculas(nombre_pelicula,sinopsis,id_clasificacion,id_categoria,age_estreno) values('It','Varios niños de una pequeña ciudad del estado de Maine se alían para combatir a una entidad diabólica que adopta la forma de un payaso y desde hace mucho tiempo emerge cada 27 años para saciarse de sangre infantil', 3, 5, 2017),('Avengers end game','Los Vengadores restantes deben encontrar una manera de recuperar a sus aliados para un enfrentamiento épico con Thanos, el malvado que diezmó el planeta y el universo.',1,2,2019);
+insert into dbo_estado(estado) values('En prestamo'),('Entregado');
+insert into dbo_alquiler(id_pelicula,id_cliente,descripcion,fecha_alquiler,fecha_entrega,costo,id_estado) values(1,1,'Pelicula alquilada por 2 dias, pago el total del costo','2019-06-15','2019-06-17','1.50',1),
+(1,2,'pelicula alquilada por 5 dias, pago el total del costo','2019-06-15','2019-06-20','2.50',1);
+
+select * from dbo_clientes order by id_cliente;
+select * from dbo_clasificacion;
+select * from dbo_categoria;
+select * from dbo_peliculas where id_pelicula = 1;
+select p.id_pelicula, p.nombre_pelicula, p.sinopsis, c.clasificacion, ca.categoria, p.age_estreno from dbo_peliculas p inner join dbo_clasificacion c on c.id_clasificacion = p.id_clasificacion inner join dbo_categoria ca on ca.id_categoria = p.id_categoria;
+
+select a.id_alquiler, p.nombre_pelicula, c.nombre_cliente, c.apellido_cliente, a.descripcion, a.fecha_alquiler, a.fecha_entrega, a.costo, e.estado from dbo_alquiler a inner join dbo_peliculas p on p.id_pelicula = a.id_pelicula inner join dbo_clientes c on c.id_cliente = a.id_cliente inner join dbo_estado e on e.id_estado = a.id_estado;
+
+select * from dbo_alquiler where id_alquiler = 1;
+
